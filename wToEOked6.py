@@ -151,7 +151,7 @@ def parse_docx(docx_path,i_in,workbook):
     for n_i in range(50,len(seq)):
         if seq[n_i] != '/':
            seq_num.append(seq[n_i])
-           ++n_i
+           n_i = n_i + 1
 
     #一般情况
     temputure = re.findall(r'-?\d+.?\d*e?-?\d*?',table.cell(4,2).text)  #体温,re.findall()提取数字
@@ -186,7 +186,7 @@ def parse_docx(docx_path,i_in,workbook):
     for n_j in range(12,len(eat_habit)):
         if eat_habit[n_j] != '/':
            eat_habit_num.append(eat_habit[n_j])
-           ++n_j
+           n_j = n_j + 1
 
     smok_condt_num = table.cell(17,3).text.split()[-1] #吸烟状况
     smok_perday_num = re.findall(r'-?\d+.?\d*e?-?\d*?',table.cell(18,3).text) #日吸烟量
