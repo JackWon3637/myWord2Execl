@@ -6,10 +6,8 @@ import re
 
 from docx import Document
 
-
 '''
-已能实现循环读入docx文件，并将信息写入同一excel中,初步实现列表查找，
-比对病人与医生信息，将信息填入合适位置。
+已能实现循环读入docx文件，并将信息写入同一excel中,初步实现列表查找，比对病人与医生信息，将信息填入合适位置。
 '''
 
 #将doc文件另存为docx文件
@@ -20,7 +18,6 @@ def doc_to_docx(path):
         doc.SaveAs(os.path.splitext(path)[0]+".docx",16)  #转化后路径下的文件,16代表另存为docx文件
         doc.Close()
         word.Quit()
-
         
 #获取文件夹下的所有文件的绝对路径
 def find_file(path, ext, file_list=[]):
@@ -43,8 +40,7 @@ def write_excel(docx_path,i_in,workbook,name,doctor,seq_num,temputure,mailv,hupi
                 hear,exr_ability,skin,gongmo,linba,tzx,hxy,luoyin,zbdm,kfxt,
                 xdt,nwl,thhdb,xbx,B_super,nxgb,szb,xzb,xgb,ybb,sjb,qtb,jkzd
                 ):
-    
-    
+      
     sheet=workbook.Worksheets(1) #获取当前第一个表格
     nrows = sheet.UsedRange.Rows.Count #获取excel表格当前行数
     print(nrows)
@@ -119,11 +115,8 @@ def write_excel(docx_path,i_in,workbook,name,doctor,seq_num,temputure,mailv,hupi
     #无法提取first_sheet.Cells(i_in,'BT').value = xcg
     sheet.Cells(i_in,'CB').value = kfxt
     sheet.Cells(i_in,'CC').value = xdt
-
     sheet.Cells(i_in,'CD').value = nwl
     sheet.Cells(i_in,'CF').value = thhdb
-
-
     sheet.Cells(i_in,'CU').value = xbx
     sheet.Cells(i_in,'CV').value = B_super
 
@@ -202,22 +195,21 @@ def parse_docx(docx_path,i_in,workbook):
     drink_fre = table.cell(20,3).text.split()[-1] #饮酒频率
     #drink_perday = re.findall(r'-?\d+.?\d*e?-?\d*?',table.cell(21,3).text) #日饮酒量
   
-    ''' 饮酒戒酒状况不知是否需要统计，数字部分下标为7，但若未统计的话，易产生越界情况  '''  
+    ''' 饮酒戒酒状况不知是否需要统计，数字部分下标为7，但若统计的话，易产生越界情况  '''  
     '''#保留饮酒信息模块
-    is_dryout_num = table.cell(22,3).text.split()#[7] #是否戒酒
+    is_dryout_num = table.cell(22,3).text.split()#[-1] #是否戒酒
     if is_dryout_num == '2':
         dryout_age = is_dryout[4]
     else:
         dryout_age = '0'
     drink_beg_age = re.findall(r'-?\d+.?\d*e?-?\d*?',table.cell(23,3).text) #开始饮酒年龄
-    is_drunk = table.cell(23,5).text.split()[4] #一年内是否醉酒
+    is_drunk = table.cell(23,5).text.split()[-1] #一年内是否醉酒
     drink_mode = table.cell(24,3).text #饮酒种类
     #无法识别
     occupational_disease = table.cell(25,2).text #职业病危害因素接触史，文本无法提取
     #无法识别
     '''
-
-
+    
     ''' 第二张表格 '''
 
     table1 = tables[1] #获取文件中的第二个表格
@@ -296,7 +288,6 @@ def parse_docx(docx_path,i_in,workbook):
                 hear,exr_ability,skin,gongmo,linba,tzx,hxy,luoyin,zbdm,kfxt,
                 xdt,nwl,thhdb,xbx,B_super,nxgb,szb,xzb,xgb,ybb,sjb,qtb,jkzd)
   
-
 if __name__ == "__main__":
     start = time.time()
     word = win32com.client.Dispatch('Word.Application') #打开word应用程序
