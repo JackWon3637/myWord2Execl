@@ -3,7 +3,6 @@ import win32com
 import time
 import os
 import re
-
 from docx import Document
 
 '''
@@ -12,10 +11,10 @@ from docx import Document
 
 #将doc文件另存为docx文件
 def doc_to_docx(path):
-    if os.path.splitext(path)[1] == ".doc":
-        word = win32com.client.Dispatch('Word.Application')
-        doc = word.Documents.Open(path)  #目标路径下的文件
-        doc.SaveAs(os.path.splitext(path)[0]+".docx",16)  #转化后路径下的文件,16代表另存为docx文件
+    if os.path.splitext(path)[1] == ".doc": #判断文件扩展名是否为.doc
+        word = win32com.client.Dispatch('Word.Application') #调用Word程序
+        doc = word.Documents.Open(path)  #打开目标路径下的文件
+        doc.SaveAs(os.path.splitext(path)[0]+".docx",16) #另存为docx文件后的路径和名称,16代表另存为docx文件
         doc.Close()
         word.Quit()
         
@@ -29,7 +28,7 @@ def find_file(path, ext, file_list=[]):
         else:
             if ext == os.path.splitext(i)[1]:
                 file_list.append(i)
-    return file_list
+    return file_list #返回文件列表
 
 '''将word表格信息写入excel'''
 def write_excel(docx_path,i_in,workbook,name,doctor,seq_num,temputure,mailv,hupin,bld_presure_left,
@@ -43,10 +42,9 @@ def write_excel(docx_path,i_in,workbook,name,doctor,seq_num,temputure,mailv,hupi
       
     sheet=workbook.Worksheets(1) #获取当前第一个表格
     nrows = sheet.UsedRange.Rows.Count #获取excel表格当前行数
-    print(nrows)
-    #匹配word文件中的姓名和医生信息，将信息填入相应表格中
-    #如果找不到，向屏幕打印找不到此人
-    for num in range(2,nrows):
+    print(nrows) #打印当前行数
+    #将word文件中的姓名和医生信息于excel表格已存在的信息匹配，将信息填入相应单元中；如果找不到，向屏幕打印查无此人，并将此人信息添加入表格末尾
+    for num in range(2,nrows): #从第2行开始，一直到当前表的最后行
         if str(sheet.Cells(num,'A').text.split()) == str(name) and str(sheet.Cells(num,'K').text.split()) == str(doctor):
             i_in = num
             break
@@ -139,10 +137,10 @@ def parse_docx(docx_path,i_in,workbook):
     tables = document.tables #获取文件中的表格集,word文档中可能有多个表格
 
     ''' 第一张表格 '''
-    table = tables[0]  #通过下标,获取文件中的第一个表格
+    table = tables[0] #通过下标,获取文件中的第一个表格
     #title= document.paragraphs[0].text #文档标题
-    name = table.cell(0,1).text.split()   #患者姓名,<class 'str'>
-    #time = table.cell(1,2).text   #体检日期
+    name = table.cell(0,1).text.split() #患者姓名,<class 'str'>
+    #time = table.cell(1,2).text #体检日期
     doctor = table.cell(1,5).text.split() #责任医生,<class 'str'>
     
     #症状
@@ -154,8 +152,8 @@ def parse_docx(docx_path,i_in,workbook):
            n_i = n_i + 1
 
     #一般情况
-    temputure = re.findall(r'-?\d+.?\d*e?-?\d*?',table.cell(4,2).text)  #体温,re.findall()提取数字
-    mailv = re.findall(r'-?\d+.?\d*e?-?\d*?',table.cell(4,5).text)  #脉率
+    temputure = re.findall(r'-?\d+.?\d*e?-?\d*?',table.cell(4,2).text) #体温,re.findall()提取数字
+    mailv = re.findall(r'-?\d+.?\d*e?-?\d*?',table.cell(4,5).text) #脉率
     hupin = re.findall(r'-?\d+.?\d*e?-?\d*?',table.cell(5,2).text) #呼吸频率
     bld_presure_left = table.cell(5,6).text.split()[0] #血压左侧收缩
     bld_presure_left2 = table.cell(5,6).text.split()[2] #血压左侧舒张
@@ -199,15 +197,14 @@ def parse_docx(docx_path,i_in,workbook):
     '''#保留饮酒信息模块
     is_dryout_num = table.cell(22,3).text.split()#[-1] #是否戒酒
     if is_dryout_num == '2':
-        dryout_age = is_dryout[4]
+        dryout_age = is_dryout[-1]
     else:
         dryout_age = '0'
     drink_beg_age = re.findall(r'-?\d+.?\d*e?-?\d*?',table.cell(23,3).text) #开始饮酒年龄
     is_drunk = table.cell(23,5).text.split()[-1] #一年内是否醉酒
     drink_mode = table.cell(24,3).text #饮酒种类
-    #无法识别
+    #无法识别，原因为此表格中嵌套有其他表格，故选择提取的信息为空
     occupational_disease = table.cell(25,2).text #职业病危害因素接触史，文本无法提取
-    #无法识别
     '''
     
     ''' 第二张表格 '''
@@ -217,7 +214,7 @@ def parse_docx(docx_path,i_in,workbook):
     #脏器功能
     #无法识别,原因为此表格中嵌套有其他表格，故选择提取的信息为空
     #mouth = table1.cell(0,3).text #口唇,数据无法提取
-    #无法识别
+    
     sight_left = table1.cell(1,3).text.split()[1] #左眼视力
     sight_right = table1.cell(1,3).text.split()[3] #右眼视力
     hear = table1.cell(2,3).text.split()[-1] #听力
@@ -231,36 +228,33 @@ def parse_docx(docx_path,i_in,workbook):
     hxy = table1.cell(9,3).text.split()[-1] #呼吸音
     luoyin = table1.cell(10,3).text.split()[-1] #罗音
   
-    #无法识别
+    #无法识别，信息为空，原因同上
     #xinlv = re.findall(r'-?\d+.?\d*e?-?\d*?',table1.cell(11,3).text.split()[1])
     #xinlv2 = table1.cell(11,3).text.split()
     #zayin = table1.cell(11,3).text.split() 
     #fubu = table1.cell(12,3).text.split()
-    #无法识别
 
     #xzsz = table1.cell(13,3).text.split()[8] #下肢水肿
     zbdm = table1.cell(14,3).text.split()[-1] #足背动脉
   
     #辅助检查
-    #无法识别   
+    #无法识别，信息为空，原因同上 
     #xcg = table1.cell(23 ,3).text.split() #血常规
-    #无法识别
   
-    kfxt = re.findall(r'-?\d+.?\d*e?-?\d*?',table1.cell(25,3).text)#空腹血糖
+    kfxt = re.findall(r'-?\d+.?\d*e?-?\d*?',table1.cell(25,3).text) #空腹血糖
     xdt = table1.cell(26,3).text.split()[-1] #心电图
-
 
     ''' 第三张表格 '''
 
     #辅助检查
     table2 = tables[2] #获取文件中的第三个表格
-    nwl = re.findall(r'-?\d+.?\d*e?-?\d*?',table2.cell(0,2).text)
-    thhdb = re.findall(r'-?\d+.?\d*e?-?\d*?',table2.cell(2,2).text)
-    #无法识别
+    nwl = re.findall(r'-?\d+.?\d*e?-?\d*?',table2.cell(0,2).text) #尿微量血蛋白
+    thhdb = re.findall(r'-?\d+.?\d*e?-?\d*?',table2.cell(2,2).text) #糖转化血红蛋白
+    #无法识别，信息为空，原因同上
     #ggn = table2.cell(4,1).text #肝功能
     #sgn = table2.cell(5,1).text #肾功能
     #xz = table2.cell(6,5).text #血脂
-    #无法识别,可以将下标改下试试
+    
     xbx = table2.cell(7,2).text.split()[-1] #胸部X线片
     B_super = table2.cell(8,2).text.split()[-1] #B超
 
@@ -276,10 +270,11 @@ def parse_docx(docx_path,i_in,workbook):
     ''' 第四张表格 '''
     table3 = tables[3] #获取文件中的第四个表格,小表格信息无法统计
     #主要用药情况
-    #yongy = table3.cell(2,4).text#.split()
+    #无法识别，信息为空，原因同上
+    #yongy = table3.cell(2,4).text#.split() #用药
+    #wykz = table3.cell(2,6).text#.split() #危险因素控制
     jkzd = table3.cell(3,1).text.split()[-3] #健康指导
-    #wykz = table3.cell(2,6).text#.split()
-    #调用写入excel函数
+    #调用写入Excel函数
     write_excel(docx_path,i_in,workbook,name,doctor,seq_num,temputure,mailv,hupin,bld_presure_left,
                 bld_presure_left2,bld_presure_right,bld_presure_right2,body_hig,body_weig,
                 yaowei,BMI,self_estimate_num,self_ability_num,self_cognition_num,
@@ -290,9 +285,9 @@ def parse_docx(docx_path,i_in,workbook):
   
 if __name__ == "__main__":
     start = time.time()
-    word = win32com.client.Dispatch('Word.Application') #打开word应用程序
-    excel = win32com.client.Dispatch('Excel.Application') 
-    workbook = excel.Workbooks.Open(r"C:\Users\xxxx\Desktop\ABC\xxxxx.xls") #统计表所在的绝对路径
+    word = win32com.client.Dispatch('Word.Application') #调用Word应用程序
+    excel = win32com.client.Dispatch('Excel.Application') #调用Excel应用程序
+    workbook = excel.Workbooks.Open(r"C:\Users\xxxx\Desktop\ABC\xxxxx.xls") #Excel统计表所在的绝对路径
     #后台运行,不显示,不警告
     excel.Visible = False #表格可见与否
     excel.DisplayAlerts = False #警告信息是否显示
@@ -304,7 +299,7 @@ if __name__ == "__main__":
     file_list = find_file(dir_path,ext)
     for file in file_list:
         doc_to_docx(file)
-    #遍历文件,调用读word和写excel,将信息统计起来
+    #遍历文件,调用读word程序模块和写excel程序模块,统计信息
     doc_files = os.listdir(dir_path)
     for doc in doc_files:
         if os.path.splitext(doc)[1] == '.docx':
@@ -313,7 +308,7 @@ if __name__ == "__main__":
             except Exception as e:
                 print(e)
         elif os.path.splitext(doc)[1] == '.doc':
-            print("Can not open this type of file!")     
+            print("Can not open this type of file!") #遇到.doc文件，均输出此信息   
     print('All done!')
     workbook.Close()
     excel.Application.Quit()
