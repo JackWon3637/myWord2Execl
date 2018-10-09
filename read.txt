@@ -1,4 +1,6 @@
-这段Python代码初步实现了将批量的Word文档中的信息提取出来，写入同一个Excel表格的功能。作为编程入门小白的第一段GitHub上传的代码，希望能给同样需求的童鞋一些帮助，就像那些大神对我的帮助一样；也希望能得到相关方面大神的指导和指正，不足之处，还请多多批评指教！
+这段Python代码初步实现了将批量的Word文档中的信息提取出来，写入同一个Excel表格的功能。
+作为编程入门小白的第一段GitHub上传的代码，希望能给同样需求的童鞋一些帮助，就像那些大神对我的帮助一样；
+也希望能得到相关方面大神的指导和指正，不足之处，还请多多批评指教！
 To my forign visitors:
 To cut a long story short, thank you for visiting my codes.
 If there any errors, please tell me about that, thank you! 
